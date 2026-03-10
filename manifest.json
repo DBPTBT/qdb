@@ -1,1 +1,16 @@
 
+{
+  "short_name": "Quỹ Đội",
+  "name": "Quản Lý Quỹ Đội Bóng",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/6054/6054316.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff"
+}
