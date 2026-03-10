@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Quỹ Đội Bóng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+	<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/6054/6054316.png">
+<link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/6054/6054316.png">
+    <style>
+        body { background-color: #f2f2f7; font-family: -apple-system, system-ui, sans-serif; -webkit-user-select: none; touch-action: pan-y; }
+        .dark body { background-color: #000000; }
+        .glass-header { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .tap-scale { transition: transform 0.1s; }
+        .tap-scale:active { transform: scale(0.95); }
+        .admin-only { display: none !important; }
+        body.is-admin .admin-only { display: flex !important; }
+        /* Chỉnh chiều cao modal để không tràn */
+        .modal-content { max-height: 75vh; display: flex; flex-direction: column; }
+    </style>
+</head>
+<body class="pb-32 dark:text-white">
+
+    <div class="glass-header sticky top-0 z-20 px-6 pt-12 pb-5 bg-white/80 dark:bg-zinc-900/80 border-b dark:border-zinc-800">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Số dư hiện tại</p>
+                <h1 id="total-balance" class="text-3xl font-black mt-0.5 tracking-tight text-green-600">0đ</h1>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleDarkMode()" class="p-2.5 tap-scale bg-gray-100 dark:bg-zinc-800 rounded-full text-gray-500">
+                    <svg id="sun-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path></svg>
+                    <svg id="moon-icon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                </button>
+                <button id="auth-btn" onclick="handleAuth()" class="p-2.5 tap-scale bg-blue-50 dark:bg-zinc-800 rounded-full text-blue-600">
+                    <svg id="lock-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    <svg id="admin-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                </button>
+                <button id="logout-btn" onclick="logout()" class="hidden p-2.5 tap-scale bg-red-50 dark:bg-red-900/20 rounded-full text-red-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="flex justify-between items-center mt-6 bg-gray-200/50 dark:bg-zinc-800/60 p-1 rounded-xl">
+            <button onclick="changeMonth(-1)" class="w-12 h-9 flex items-center justify-center text-blue-600 tap-scale">◀</button>
+            <div class="text-center">
+                <span id="month-year-display" class="font-bold text-[10px] text-gray-500 uppercase block">THÁNG --/----</span>
+                <span id="monthly-stats" class="text-xs font-bold text-blue-600">Đã đóng: 0/0</span>
+            </div>
+            <button onclick="changeMonth(1)" class="w-12 h-9 flex items-center justify-center text-blue-600 tap-scale">▶</button>
+        </div>
+    </div>
+
+    <div class="p-4 space-y-6">
+        <section>
+            <h2 class="text-[11px] font-bold text-gray-400 uppercase ml-1 mb-3">Thành viên (50k)</h2>
+            <div id="member-list" class="flex flex-wrap gap-2.5"></div>
+        </section>
+
+        <section>
+            <h2 class="text-[11px] font-bold text-gray-400 uppercase ml-1 mb-3">Lịch sử giao dịch</h2>
+            <div id="trans-details" class="bg-white dark:bg-zinc-900 rounded-2xl divide-y dark:divide-zinc-800 overflow-hidden border dark:border-zinc-800 shadow-sm"></div>
+        </section>
+    </div>
+
+    <div class="admin-only fixed bottom-8 right-6 flex flex-col space-y-4">
+        <button onclick="addIncome()" class="w-14 h-14 bg-green-500 text-white rounded-full shadow-xl tap-scale flex items-center justify-center border-4 border-white dark:border-black"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v12m6-6H6"></path></svg></button>
+        <button onclick="addExpense()" class="w-14 h-14 bg-red-500 text-white rounded-full shadow-xl tap-scale flex items-center justify-center border-4 border-white dark:border-black"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M18 12H6"></path></svg></button>
+    </div>
+
+    <div id="member-manager" class="hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm p-4 flex items-end justify-center">
+        <div class="bg-white dark:bg-zinc-900 w-full max-w-sm rounded-t-[30px] shadow-2xl modal-content overflow-hidden">
+            <div class="p-6 flex justify-between items-center border-b dark:border-zinc-800">
+                <h3 class="font-bold text-xl dark:text-white">Thành viên</h3>
+                <button onclick="toggleMemberManager()" class="text-gray-400 text-2xl">✕</button>
+            </div>
+            <div id="manager-list" class="flex-1 overflow-y-auto p-4 space-y-2 bg-gray-50 dark:bg-black"></div>
+            <div class="p-6 bg-white dark:bg-zinc-900">
+                <button onclick="addMember()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl tap-scale">Thêm người mới</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // --- DÁN CONFIG FIREBASE CỦA BẠN VÀO ĐÂY ---
+          const firebaseConfig = {
+  apiKey: "AIzaSyAOi8xccL0NfLu0ohI9CmuZrKpUi32VG_s",
+  authDomain: "football-fund.firebaseapp.com",
+  projectId: "football-fund",
+  storageBucket: "football-fund.firebasestorage.app",
+  messagingSenderId: "563775982",
+  appId: "1:563775982:web:1ceaa9b320ba21dbf226ff",
+  measurementId: "G-W6TJKQ5TXG"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const ADMIN_PASS = "123"; // Thay mật khẩu của bạn
+        let isAdmin = localStorage.getItem('isAdmin') === 'true';
+        let currentMonth = new Date().getMonth() + 1;
+        let currentYear = new Date().getFullYear();
+        let allTrans = [];
+        let allMem = [];
+
+        const formatMoney = (v) => new Intl.NumberFormat('vi-VN').format(v) + 'đ';
+
+        window.handleAuth = () => {
+            if (isAdmin) { toggleMemberManager(); } 
+            else {
+                const p = prompt("Nhập mật khẩu quản trị:");
+                if (p === ADMIN_PASS) { isAdmin = true; localStorage.setItem('isAdmin', 'true'); updateAuthUI(); }
+                else if (p) alert("Sai mật khẩu!");
+            }
+        };
+
+        window.logout = () => {
+            if(confirm("Thoát quyền quản trị?")) { isAdmin = false; localStorage.setItem('isAdmin', 'false'); updateAuthUI(); }
+        };
+
+        function updateAuthUI() {
+            const authBtn = document.getElementById('auth-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            if (isAdmin) {
+                document.body.classList.add('is-admin');
+                document.getElementById('lock-icon').classList.add('hidden');
+                document.getElementById('admin-icon').classList.remove('hidden');
+                authBtn.classList.replace('text-blue-600', 'text-green-500');
+                logoutBtn.classList.remove('hidden');
+            } else {
+                document.body.classList.remove('is-admin');
+                document.getElementById('lock-icon').classList.remove('hidden');
+                document.getElementById('admin-icon').classList.add('hidden');
+                authBtn.classList.replace('text-green-500', 'text-blue-600');
+                logoutBtn.classList.add('hidden');
+            }
+            render();
+        }
+
+        function load() {
+            onSnapshot(collection(db, "members"), (s) => { allMem = s.docs.map(d => ({id: d.id, ...d.data()})); render(); });
+            onSnapshot(collection(db, "transactions"), (s) => { allTrans = s.docs.map(d => ({id: d.id, ...d.data()})); render(); });
+            updateAuthUI();
+        }
+
+        function render() {
+            const mStr = `${currentMonth}-${currentYear}`;
+            document.getElementById('month-year-display').innerText = `THÁNG ${mStr}`;
+
+            let bal = 0;
+            allTrans.forEach(t => t.type === 'thu' ? bal += t.amount : bal -= t.amount);
+            document.getElementById('total-balance').innerText = formatMoney(bal);
+
+            let paid = 0;
+            document.getElementById('member-list').innerHTML = allMem.map(m => {
+                const isPaid = allTrans.some(t => t.monthYear === mStr && t.note === `Đóng quỹ: ${m.name}`);
+                if(isPaid) paid++;
+                return `<button onclick="window.pay('${m.name}', ${isPaid})" class="px-5 py-2.5 rounded-2xl text-xs font-bold tap-scale ${isPaid ? 'bg-green-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border dark:border-zinc-700 shadow-sm'}">${m.name}${isPaid ? ' ✓' : ''}</button>`;
+            }).join('');
+            document.getElementById('monthly-stats').innerText = `Đã đóng: ${paid}/${allMem.length}`;
+
+            const cur = allTrans.filter(t => t.monthYear === mStr).sort((a,b) => b.date - a.date);
+            document.getElementById('trans-details').innerHTML = cur.map(t => `
+                <div class="flex justify-between items-center p-4">
+                    <div><p class="text-sm font-bold">${t.note}</p><p class="text-[9px] text-gray-400 uppercase">${new Date(t.date?.seconds*1000).toLocaleDateString('vi-VN')}</p></div>
+                    <div class="flex items-center gap-4">
+                        <span class="font-black text-sm ${t.type === 'thu' ? 'text-green-600' : 'text-red-500'}">${t.type === 'thu' ? '+' : '-'}${formatMoney(t.amount)}</span>
+                        ${isAdmin ? `<button onclick="window.delTr('${t.id}')" class="text-gray-300">✕</button>` : ''}
+                    </div>
+                </div>`).join('') || '<div class="p-10 text-center text-gray-400 text-xs italic">Không có dữ liệu</div>';
+
+            document.getElementById('manager-list').innerHTML = allMem.map(m => `
+                <div class="flex justify-between items-center bg-white dark:bg-zinc-800 p-4 rounded-2xl shadow-sm border dark:border-zinc-700">
+                    <span class="font-bold">${m.name}</span>
+                    <button onclick="window.delMem('${m.id}', '${m.name}')" class="text-red-500 font-bold px-2">XÓA</button>
+                </div>`).join('');
+        }
+
+        window.pay = async (n, p) => { if(!isAdmin) return; if(!p && confirm(`Xác nhận ${n} đóng 50k?`)) await addDoc(collection(db, "transactions"), { amount: 50000, type: 'thu', note: `Đóng quỹ: ${n}`, monthYear: `${currentMonth}-${currentYear}`, date: new Date() }); };
+        window.delMem = async (id, n) => { if(confirm(`Xóa ${n}?`)) await deleteDoc(doc(db, "members", id)); };
+        window.toggleMemberManager = () => document.getElementById('member-manager').classList.toggle('hidden');
+        window.addMember = async () => { const n = prompt("Tên thành viên:"); if(n) await addDoc(collection(db, "members"), { name: n }); };
+        window.addIncome = async () => { const n = prompt("Nội dung thu:"); const a = parseInt(prompt("Số tiền:")); if(n && a) await addDoc(collection(db, "transactions"), { amount: a, type: 'thu', note: n, monthYear: `${currentMonth}-${currentYear}`, date: new Date() }); };
+        window.addExpense = async () => { const n = prompt("Nội dung chi:"); const a = parseInt(prompt("Số tiền:")); if(n && a) await addDoc(collection(db, "transactions"), { amount: a, type: 'chi', note: n, monthYear: `${currentMonth}-${currentYear}`, date: new Date() }); };
+        window.delTr = async (id) => { if(confirm("Xóa khoản này?")) await deleteDoc(doc(db, "transactions", id)); };
+        window.changeMonth = (v) => { currentMonth += v; if(currentMonth > 12){ currentMonth=1; currentYear++; } if(currentMonth < 1){ currentMonth=12; currentYear--; } render(); };
+        window.toggleDarkMode = () => { const d = document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', d ? 'dark' : 'light'); document.getElementById('sun-icon').classList.toggle('hidden', !d); document.getElementById('moon-icon').classList.toggle('hidden', d); };
+        if (localStorage.getItem('theme') === 'dark') window.toggleDarkMode();
+
+        load();
+    </script>
+</body>
+</html>
